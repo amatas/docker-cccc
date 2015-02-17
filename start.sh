@@ -8,24 +8,13 @@ sed -e "s|^web_admin_enable .*$|web_admin_enable : false|" -i /etc/resin/resin.p
 sed -e "s|^dev_mode .*$|dev_mode : false|" -i /etc/resin/resin.properties
 sed -e "s|^resin_doc .*$|resin_doc : false|" -i /etc/resin/resin.properties
 
-chown resin:resin -R /var/resin/webapps/ccc
+if [ ! -z $CCC_PASSWORD ]; then
+  find /var/resin/webapps/ROOT -name *.php -type f -print0 | xargs -0 sed -i "s/password1234567890/${CCC_PASSWORD}/g"
+  find /var/resin/webapps/ROOT -name *.java -type f -print0 | xargs -0 sed -i "s/password1234567890/${CCC_PASSWORD}/g"
+fi
+
+chown resin:resin -R /var/resin/webapps
 chown resin:resin -R /var/resin/webapp-jars
 
-
-# TODO: 
-#  - log everygthing to stdout
-
-# cat >/etc/supervisord.d/resin.ini<<EOF
-# [program:resin]
-# command=/usr/bin/java -d64 -jar /usr/local/share/resin-4.0.42/lib/resin.jar -root-directory /var/resin -conf /etc/resin/resin.xml start-with-foreground
-# user=resin
-# autorestart=true
-# redirect_stderr=true
-# stdout_logfile=/dev/stdout
-# stdout_logfile_maxbytes=0
-# EOF
-
-# we don't use supervisor because resin watchdog doesn't kill its childs processes
-# supervisord -c /etc/supervisord.conf
-
-/usr/bin/resinctl start-with-foreground
+/usr/bin/resinctl start
+tail -f /var/log/resin/jvm-app-0.log
