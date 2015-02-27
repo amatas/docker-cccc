@@ -1,7 +1,7 @@
-## CCCC Dockerfile
+## CCCC Dockerfile details
 
 
-This repository is used to build [Controllable Crowd Caption Correction] Docker image.
+This repository is used to build [Controllable Crowd Caption Correction](https://github.com/GPII/controllable-crowd-caption-correction) Docker image.
 
 
 ### Port(s) Exposed
@@ -18,53 +18,90 @@ This repository is used to build [Controllable Crowd Caption Correction] Docker 
 
 * /var/resin
 
+## How to deploy the container
+
+
 ### Download
 
-    docker pull trace/ccc
+If the container is available in [Docker Hub Registry](https://registry.hub.docker.com/) you can run this command to fetch a already built container:
 
+```
+docker pull trace/ccc
+```
 
-#### Run `Resin`
+### Build the container
+
+Also, you can build the container using the source code of this git repository:
+
+1. Clone this repository
+  
+  ```
+  git clone https://github.com/gpii-ops/docker-ccc.git
+  ```
+
+2. Clone the source data of CCCC
+
+  ```
+  cd docker-ccc
+  git clone https://github.com/GPII/controllable-crowd-caption-correction.git data
+  ```
+ 
+3. Build the container
+
+  ```
+  docker build --rm=true -t trace/ccc .
+  ```
+
+### Run `Resin`
+
+That commmand will make that the application listens at 8080 port of the local machine:
 
 
 ```
 docker run \
 -d \
 -p 8080:8080 \
+-e "CCC_PASSWORD=secretpassword" \
 --name="resin" \
 trace/ccc
 ```
 
-### Build your own image
 
 
-    docker build --rm=true -t <your name>/ccc .
+## Development and testing
 
-### Development and testing
-
-  A Vagrantfile is provided in order to make easy the testing and the development of the application. [Vagrant application](https://www.vagrantup.com/) and [Virtualbox](https://www.virtualbox.org/) are needed to boot a virtual machine with all the stuff inside it.
+  A Vagrantfile is provided in order to make easier the testing and the development of the application. [Vagrant application](https://www.vagrantup.com/) and [Virtualbox](https://www.virtualbox.org/) are needed to boot a virtual machine with all the stuff inside it.
 
   The application source must be in the "data" directory, and any change made in that directory will be reflected in the running application.
 
-  The application is served through the 127.0.0.1:8888 port of the local machine.
-
+  ```
+  git clone https://github.com/gpii-ops/docker-ccc.git
+  cd docker-ccc
+  git clone https://github.com/GPII/controllable-crowd-caption-correction.git data
+  ```
+  
   Once Vagrant is installed to boot up the virtual machine run the following command:
 
   ```
   vagrant up
   ```
 
+  The application is served through the 127.0.0.1:8888 port of the local machine.
+
   *The first time that you run this command Vagrant downloads some image files, so this proccess takes some time.*
 
-  to shutdown the virtual machine:
+### Shutdown the virtual machine:
   ```
   vagrant halt
   ```
 
-  to access to the virtual machine using SSH:
+### Access to the virtual machine using SSH:
+
   ```
   vagrant ssh
   ```
 
+### Redeploy the components
 
   If you need to deploy all the docker containers in the virtual machine run:
 
@@ -72,9 +109,11 @@ trace/ccc
   vagrant provision
   ```
 
+### Reset the environment
+
   If you want to start from the beggining: destroy the vm and create a new one:
 
   ```
   vagrant destroy
-  vagrnat up
+  vagrant up
   ```
